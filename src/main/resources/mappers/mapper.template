@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.qunar.hotel.qta.order.adapter.base.service.mapper.OrderSyncTimeMapper">
+
+    <!--这里配置引入的Condition的位置, 只能改type-->
+    <parameterMap id="condition" type="com.benmu.mts.order.core.api.dao.condition.Condition"/>
+
+    <!--修改一: 数据库对应的实体bean, 只能改type-->
+    <resultMap id="entityResult" type="MessageEventStored"/>
+    <parameterMap id="entityParam" type="MessageEventStored"/>
+
+    <!--修改二: 对应表-->
+    <sql id="table"> order_sync_time </sql>
+
+    <!--修改三: 查询字段-->
+    <sql id="selectFields">
+        id,
+        supplier_id as supplierId,
+        interface_type as interfaceType,
+        last_sync_time as lastSyncTime,
+        sync_status as syncStatus,
+        create_time as createTime,
+        update_time as updateTime
+    </sql>
+
+    <!--修改四: 需要更新的字段, 只能改obj后面的属性(不要修改"obj"这个名字,这个为固定)-->
+    <sql id="updateSet">
+        <if test="obj !=null">
+            <if test="obj.lastSyncTime != null">
+                last_sync_time = #{obj.lastSyncTime},
+            </if>
+            <if test="obj.syncStatus != null">
+                sync_status = #{obj.syncStatus},
+            </if>
+        </if>
+    </sql>
+
+    <!--修改五:插入的字段以及书体属性映射-->
+    <insert id="insertOrUpdate" parameterMap="entityParam" useGeneratedKeys="true" keyProperty="id">
+
+        INSERT INTO
+        <include refid="table"/>
+        (
+        supplier_id
+        interface_type,
+        last_sync_time,
+        sync_status,
+        create_time
+        )
+        VALUES
+        (
+        #{supplierId},
+        #{interfaceType},
+        #{lastSyncTime},
+        #{syncStatus},
+        #{createTime}
+        )
+        ON DUPLICATE KEY UPDATE update_time = #{updateTime}
+
+    </insert>
+
+
+    <!--####################################### 华丽的分割线 ###################################################-->
+    <!--####################################### 以下部分均不需做任何修改 #############################################-->
+
+    <update id="delete" parameterMap="condition">
+        DELETE FROM
+        <include refid="table"/>
+        <where>
+
+            <if test="expressions != null and expressions.size() > 0">
+                <foreach collection="expressions" item="expression" index="index" open=" " close="" separator="and">
+                    ${expression.field} ${expression.symbol} #{expression.value}
+                </foreach>
+            </if>
+
+            <if test="inExpressions != null and inExpressions.size() > 0">
+                AND
+                <foreach collection="inExpressions" item="inExpression" index="index" open=" " close="" separator="and">
+                    ${inExpression.field} in
+                    <if test="inExpression.value != null and inExpression.value.size()>0">
+                        <foreach collection="inExpression.value" item="v" index="index" open="(" close=")"
+                                 separator=",">
+                            #{v}
+                        </foreach>
+                    </if>
+                </foreach>
+            </if>
+        </where>
+    </update>
+
+    <select id="query" parameterMap="condition"
+            resultMap="entityResult">
+        SELECT
+        <include refid="selectFields"/>
+        FROM
+        <include refid="table"/>
+
+        <where>
+
+            <if test="expressions != null and expressions.size() > 0">
+                <foreach collection="expressions" item="expression" index="index" open=" " close="" separator="and">
+                    ${expression.field} ${expression.symbol} #{expression.value}
+                </foreach>
+            </if>
+
+            <if test="inExpressions != null and inExpressions.size() > 0">
+                AND
+                <foreach collection="inExpressions" item="inExpression" index="index" open=" " close="" separator="and">
+                    ${inExpression.field} in
+                    <if test="inExpression.value != null and inExpression.value.size()>0">
+                        <foreach collection="inExpression.value" item="v" index="index" open="(" close=")"
+                                 separator=",">
+                            #{v}
+                        </foreach>
+                    </if>
+                </foreach>
+            </if>
+        </where>
+
+        <if test="sorts != null and sorts.size() > 0 ">
+            <foreach collection="sorts" item="sort" index="index" open=" order by " close="" separator=",">
+                ${sort.name} ${sort.order}
+            </foreach>
+        </if>
+        <if test="sorts == null or sorts.size() == 0 ">
+            ORDER BY NULL
+        </if>
+        <if test="rowBound != null ">
+            limit #{rowBound.limit} offset #{rowBound.offset}
+        </if>
+
+
+    </select>
+
+    <update id="update">
+        UPDATE
+        <include refid="table"/>
+        <set>
+            <include refid="updateSet"/>
+        </set>
+        where id = #{obj.id}
+    </update>
+
+
+    <select id="count" resultType="int" parameterMap="condition">
+        SELECT
+        COUNT(*)
+        FROM
+        <include refid="table"/>
+        <where>
+
+            <if test="expressions != null and expressions.size() > 0">
+                <foreach collection="expressions" item="expression" index="index" open=" " close="" separator="and">
+                    ${expression.field} ${expression.symbol} #{expression.value}
+                </foreach>
+            </if>
+
+            <if test="inExpressions != null and inExpressions.size() > 0">
+                AND
+                <foreach collection="inExpressions" item="inExpression" index="index" open=" " close="" separator="and">
+                    ${inExpression.field} in
+                    <if test="inExpression.value != null and inExpression.value.size()>0">
+                        <foreach collection="inExpression.value" item="v" index="index" open="(" close=")"
+                                 separator=",">
+                            #{v}
+                        </foreach>
+                    </if>
+                </foreach>
+            </if>
+        </where>
+    </select>
+
+    <update id="updateByCondition">
+        UPDATE
+        <include refid="table"/>
+        <set>
+            <include refid="updateSet"/>
+        </set>
+        <where>
+            <if test="condition.expressions != null and condition.expressions.size() > 0">
+                <foreach collection="condition.expressions" item="expression" index="index" open=" " close=""
+                         separator="and">
+                    ${expression.field} ${expression.symbol} #{expression.value}
+                </foreach>
+            </if>
+
+            <if test="condition.inExpressions != null and condition.inExpressions.size() > 0">
+                AND
+                <foreach collection="condition.inExpressions" item="inExpression" index="index" open=" " close=""
+                         separator="and">
+                    ${inExpression.field} in
+                    <if test="inExpression.value != null and inExpression.value.size()>0">
+                        <foreach collection="inExpression.value" item="v" index="index" open="(" close=")"
+                                 separator=",">
+                            #{v}
+                        </foreach>
+                    </if>
+                </foreach>
+            </if>
+        </where>
+    </update>
+
+</mapper>

@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:dubbo="http://code.alibabatech.com/schema/dubbo"
+       xsi:schemaLocation="http://code.alibabatech.com/schema/dubbo http://code.alibabatech.com/schema/dubbo/dubbo.xsd
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
+
+    <!--<dubbo:application name="mts_order_core_p" owner="yushen.ma" organizationCode="mts-dev"/>-->
+
+    <!-- self registry-->
+    <dubbo:registry id="mts-core-registry" protocol="zookeeper"
+                    address="${common.zookeeper.address}" check="false"
+                    group="${core.dubbo.group}"/>
+
+
+    <!-- hospital adaptor registry -->
+    <dubbo:registry id="mts-ha-registry" protocol="zookeeper"
+                    address="${common.zookeeper.address}"
+                    group="${ha.dubbo.group}"
+                    check="false"/>
+
+    <!-- store registry -->
+    <dubbo:registry id="mts-store-registry" protocol="zookeeper"
+                    address="${common.zookeeper.address}"
+                    group="${store.dubbo.group}"
+                    check="false"/>
+
+    <!-- store registry -->
+    <dubbo:registry id="mts-baseinfo-registry" protocol="zookeeper"
+                    address="${common.zookeeper.address}"
+                    group="${baseinfo.dubbo.group}"
+                    check="false"/>
+
+    <!-- matador registry -->
+    <dubbo:registry id="pt-matador-registry" protocol="zookeeper"
+                    address="${common.zookeeper.address}"
+                    group="${matador.dubbo.group}"
+                    check="false"/>
+
+
+    <dubbo:registry id="pt-ucenter-registry" protocol="zookeeper"
+                    address="${common.zookeeper.address}"
+                    group="${ucenter.dubbo.group}"
+                    check="false"/>
+
+    <dubbo:registry id="pt-jyt-registry" protocol="zookeeper"
+                    address="${common.zookeeper.address}" check="false"
+                    group="${jyt.dubbo.group}"/>
+
+</beans>

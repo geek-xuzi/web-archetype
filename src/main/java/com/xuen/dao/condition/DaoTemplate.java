@@ -1,6 +1,5 @@
-package com.xuen.dao;
+package com.xuen.dao.condition;
 
-import com.xuen.dao.condition.Condition;
 import java.util.List;
 import org.apache.ibatis.annotations.Param;
 
@@ -53,4 +52,5 @@ public interface DaoTemplate<T> {
      * @return
      */
     int count(Condition condition);
+
 }
